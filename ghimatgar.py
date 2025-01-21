@@ -197,10 +197,14 @@ async def button_click(update: Update, context: CallbackContext):
         if query.data == 'contact':
             await show_contact(update, context)
         elif query.data.startswith('direct_'):
-            course_type = query.data.split('_')[1]
+            _, course_type = query.data.split('_', 1)
+            if course_type not in COURSES:
+                raise ValueError(f"درس نامعتبر: {course_type}")
             await send_course_files(update, context, course_type)
         elif query.data.startswith('link_'):
-            course_type = query.data.split('_')[1]
+            _, course_type = query.data.split('_', 1)
+            if course_type not in COURSES:
+                raise ValueError(f"درس نامعتبر: {course_type}")
             await send_drive_link(update, context, course_type)
         elif query.data in COURSES:
             await show_download_options(update, context, query.data)
@@ -210,7 +214,7 @@ async def button_click(update: Update, context: CallbackContext):
             await query.edit_message_text(text="🔄 محتوای این بخش به زودی اضافه میشود...")
             
     except Exception as e:
-        logger.error(f"خطای کلی: {e}")
+        logger.error(f"خطای کلی: {str(e)}")
         await handle_error(update, context)
 
 async def handle_error(update: Update, context: CallbackContext):
