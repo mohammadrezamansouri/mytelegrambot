@@ -13,12 +13,12 @@ COURSES = {
     'dsp': {
         'folder': 'dsp',
         'name': 'پردازش سیگنال دیجیتال',
-        'drive_link': 'YOUR_GOOGLE_DRIVE_LINK_HERE'
+        'drive_link': 'https://drive.google.com/drive/folders/1qtsdaBt-tmNruB45o7pKHSKIMxyZS2mC?usp=sharing'
     },
     'adv_dsp': {
         'folder': 'adsp',
         'name': 'پردازش سیگنال های دیجیتال پیشرفته',
-        'drive_link': 'YOUR_GOOGLE_DRIVE_LINK_HERE'
+        'drive_link': 'https://drive.google.com/drive/folders/1YpsQwMb-Seju7Q3cgkI9QTDrxiOmdiGQ?usp=sharing'
     },
     'comm_circuit': {
         'folder': 'medar',
