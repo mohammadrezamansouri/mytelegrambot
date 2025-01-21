@@ -9,6 +9,9 @@ from telegram.ext import (
 )
 
 TOKEN = "7434501070:AAFuuTwyLg0T4oENbAvMgspW3YEyMlgYSjg"
+
+
+
 COURSES = {
     'dsp': {
         'folder': 'dsp',
@@ -27,6 +30,8 @@ COURSES = {
     }
 }
 
+
+
 CONTACT_INFO = """
 📞 اطلاعات تماس:
 
@@ -38,6 +43,10 @@ CONTACT_INFO = """
 ghimatgar@pgu.ac.ir
 ➖➖➖➖➖➖
 """
+
+
+
+
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -234,12 +243,14 @@ async def error_handler(update: Update, context: CallbackContext):
     await handle_error(update, context)
 
 def main():
-    print("✅ ربات فعال شد!")
+    print("✅ The bot is now active!")
+
     
-    # ایجاد پوشه‌های مورد نیاز
+    
     for course in COURSES.values():
         os.makedirs(course['folder'], exist_ok=True)
-        print(f"📂 پوشه {course['folder']} ایجاد/بررسی شد")
+        print(f"📂 The folder {course['folder']} has been created/verified")
+
     
     application = Application.builder().token(TOKEN).build()
     application.add_handler(CommandHandler('start', start))
