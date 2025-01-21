@@ -8,24 +8,30 @@ from telegram.ext import (
     CallbackContext,
 )
 
+
+# botfather
+
 TOKEN = "7434501070:AAFuuTwyLg0T4oENbAvMgspW3YEyMlgYSjg"
+
+
+
 
 
 
 COURSES = {
     'dsp': {
         'folder': 'dsp',
-        'name': 'پردازش سیگنال دیجیتال',
+        'name': 'درس پردازش سیگنال دیجیتال',
         'drive_link': 'https://drive.google.com/drive/folders/1qtsdaBt-tmNruB45o7pKHSKIMxyZS2mC?usp=sharing'
     },
     'adv_dsp': {
         'folder': 'adsp',
-        'name': 'پردازش سیگنال های دیجیتال پیشرفته',
+        'name': 'درس پردازش سیگنال های دیجیتال پیشرفته',
         'drive_link': 'https://drive.google.com/drive/folders/1YpsQwMb-Seju7Q3cgkI9QTDrxiOmdiGQ?usp=sharing'
     },
     'comm_circuit': {
         'folder': 'medar',
-        'name': 'مدار مخابراتی',
+        'name': 'درس مدار مخابراتی',
         'drive_link': 'YOUR_GOOGLE_DRIVE_LINK_HERE'
     }
 }
@@ -36,11 +42,16 @@ CONTACT_INFO = """
 📞 اطلاعات تماس:
 
 ➖➖➖➖➖➖
+
 📱 تلفن: 
 09394959842
 
 📧 پست الکترونیکی: 
 ghimatgar@pgu.ac.ir
+
+آیدی تلگرام:
+@Hgh9816
+
 ➖➖➖➖➖➖
 """
 
@@ -68,12 +79,20 @@ async def start(update: Update, context: CallbackContext):
         if update.callback_query:
             await update.callback_query.edit_message_text(
                 '👨🏫 به ربات آموزشی دکتر قیمتگر خوش آمدید!\n'
+                                '''
+
+
+'''
                 'لطفا گزینه مورد نظر را انتخاب کنید:',
                 reply_markup=reply_markup
             )
         else:
             await update.message.reply_text(
                 '👨🏫 به ربات آموزشی دکتر قیمتگر خوش آمدید!\n'
+                '''
+
+
+'''
                 'لطفا گزینه مورد نظر را انتخاب کنید:',
                 reply_markup=reply_markup
             )
