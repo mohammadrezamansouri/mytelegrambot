@@ -24,5 +24,10 @@ This project is a Telegram bot designed for educational purposes, combining adva
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/your-username/your-repo.git
-   cd your-repo
+   git clone https://github.com/mohammadrezamansouri/mytelegrambot.git
+   cd mytelegrambot
+   
+
+1. **RUN**:
+   ```bash
+   python ghimatgar.py
