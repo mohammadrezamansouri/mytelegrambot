@@ -17,7 +17,7 @@ from telegram.ext import (
 
 # تنظیمات API
 GOOGLE_API_KEY = 'AIzaSyC53b7n-px8gnM7-govA1LMDMY0Qr7Qzr4'
-TOKEN = "7848642786:AAG4JQAhbGYrbZV2aNLO7Izq7vZwUEYbCvg"
+TOKEN = "7434501070:AAFuuTwyLg0T4oENbAvMgspW3YEyMlgYSjg"
 ADMINS = [6894055351]
 
 # حالت‌های مکالمه
