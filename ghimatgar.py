@@ -12,13 +12,21 @@ from telegram.ext import (
     ConversationHandler,
 )
 
-#API
-GOOGLE_API_KEY = 'AIzaSyC53b7n-px8gnM7-govA1LMDMY0Qr7Qzr4'
-TOKEN = "7434501070:AAFuuTwyLg0T4oENbAvMgspW3YEyMlgYSjg"
+
+
+######   API  ######
+
+GOOGLE_API_KEY = ' YOUR_GOOGLE_API_KEY'
+TOKEN = "YOUR_TOKEN_BOTFATHER"
+
+
+
+
+
+
 
 
 SMART_CHAT, END_CHAT = range(2)
-
 
 COURSES = {
     'dsp': {
