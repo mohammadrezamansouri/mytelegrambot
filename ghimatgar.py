@@ -16,8 +16,8 @@ from telegram.ext import (
 )
 
 # تنظیمات API
-GOOGLE_API_KEY = 'AIzaSyC53b7n-px8gnM7-govA1LMDMY0Qr7Qzr4'
-TOKEN = "7434501070:AAFuuTwyLg0T4oENbAvMgspW3YEyMlgYSjg"
+GOOGLE_API_KEY = '7434501070:AAFuuTwyLg0T4oENbAvMgspW3YEyMlgYSjg'
+TOKEN = "7848642786:AAG4JQAhbGYrbZV2aNLO7Izq7vZwUEYbCvg"
 ADMINS = [6894055351]
 
 # حالت‌های مکالمه
@@ -38,12 +38,12 @@ COURSES = {
     'dsp': {
         'folder': 'dsp',
         'name': 'پردازش سیگنال دیجیتال',
-        'drive_link': 'YOUR_DSP_LINK'
+        'drive_link': 'https://drive.google.com/drive/folders/1qtsdaBt-tmNruB45o7pKHSKIMxyZS2mC?usp=sharing'
     },
     'adv_dsp': {
         'folder': 'adv_dsp',
         'name': 'پردازش پیشرفته سیگنال دیجیتال',
-        'drive_link': 'YOUR_ADV_DSP_LINK'
+        'drive_link': 'https://drive.google.com/drive/folders/1YpsQwMb-Seju7Q3cgkI9QTDrxiOmdiGQ?usp=sharing'
     }
 }
 
@@ -51,22 +51,17 @@ COURSES = {
 CONTACT_INFO = """📞 اطلاعات تماس:
 ➖➖➖➖➖➖
 📱 تلفن: 09394959842
-
-
 📧 ایمیل: ghimatgar@pgu.ac.ir
-
-
 تلگرام: @Hgh9816
 ➖➖➖➖➖➖"""
 
 UNIVERSITY_INFO = """🎓 دانشگاه خلیج فارس - دانشکده سیستم های هوشمند و علوم داده 
 📚 رشته‌های مرتبط:
-- کارشناسی ارشد مهندسی برق-مخابرات سیستم
+- کارشناسی ارشد مهندسی برق-مخابرات
 - دکتری تخصصی پردازش سیگنال
 🏫 امکانات آموزشی:
 - آزمایشگاه پیشرفته DSP
-- شبیه‌سازهای مخابراتی
-- کتابخانه تخصصی برق"""
+- شبیه‌سازهای مخابراتی"""
 
 # تنظیمات لاگ
 logging.basicConfig(
@@ -98,6 +93,13 @@ def init_db():
                   sent_date TEXT,
                   success_count INTEGER,
                   fail_count INTEGER)''')
+    
+    c.execute('''CREATE TABLE IF NOT EXISTS chats
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  user_id INTEGER NOT NULL,
+                  message TEXT NOT NULL,
+                  sender TEXT NOT NULL,
+                  timestamp TEXT)''')
     
     conn.commit()
     conn.close()
@@ -149,6 +151,37 @@ class Database:
         conn.commit()
         conn.close()
 
+    @staticmethod
+    def add_chat_message(user_id: int, message: str, sender: str):
+        conn = sqlite3.connect('bot_users.db')
+        c = conn.cursor()
+        c.execute('''INSERT INTO chats 
+                    (user_id, message, sender, timestamp)
+                    VALUES (?, ?, ?, ?)''',
+                (user_id, message, sender, datetime.now().isoformat()))
+        conn.commit()
+        conn.close()
+
+    @staticmethod
+    def get_chat_users():
+        conn = sqlite3.connect('bot_users.db')
+        c = conn.cursor()
+        c.execute('SELECT DISTINCT user_id FROM chats')
+        users = [row[0] for row in c.fetchall()]
+        conn.close()
+        return users
+
+    @staticmethod
+    def get_user_chats(user_id: int):
+        conn = sqlite3.connect('bot_users.db')
+        c = conn.cursor()
+        c.execute('''SELECT message, sender, timestamp 
+                   FROM chats WHERE user_id = ? 
+                   ORDER BY timestamp''', (user_id,))
+        chats = c.fetchall()
+        conn.close()
+        return chats
+
 # --- شخصیت پردازی ---
 class ProfessorPersonality:
     PROFILE = """نام: دکتر حجت قیمتگر
@@ -184,12 +217,10 @@ class GoogleAIChat:
                 f"سوال: {prompt}\n"
                 "پاسخ باید دارای این ویژگی‌ها باشد:\n"
                 "- استفاده از اصطلاحات تخصصی به اندازه لازم\n"
-
                 "- ساختار علمی و دانشگاهی\n"
                 "- حداکثر 10% شوخ‌طبعی حرفه‌ای\n"
                 "- ارجاع به منابع درسی معتبر\n"
-                 "- پاسخ ها زیاد طولانی نباشدر\n"
-                ,
+                "- پاسخ ها زیاد طولانی نباشد\n",
                 safety_settings={
                     'HARM_CATEGORY_HARASSMENT': 'block_none',
                     'HARM_CATEGORY_HATE_SPEECH': 'block_none',
@@ -211,6 +242,7 @@ class GoogleAIChat:
 # --- دستورات کاربری ---
 async def start(update: Update, context: CallbackContext):
     try:
+        context.user_data.clear()
         user = update.effective_user
         Database.add_user({
             'id': user.id,
@@ -224,7 +256,7 @@ async def start(update: Update, context: CallbackContext):
             [InlineKeyboardButton("📶 " + COURSES['comm_circuits']['name'], callback_data='comm_circuits')],
             [InlineKeyboardButton("🎛 " + COURSES['dsp']['name'], callback_data='dsp')],
             [InlineKeyboardButton("🚀 " + COURSES['adv_dsp']['name'], callback_data='adv_dsp')],
-            [InlineKeyboardButton("💬 چت هوشمند", callback_data='smart_chat')],
+            [InlineKeyboardButton("💬 چت باهوش مصنوعی من", callback_data='smart_chat')],
             [InlineKeyboardButton("📞 ارتباط با من", callback_data='contact')]
         ]
         
@@ -236,18 +268,15 @@ async def start(update: Update, context: CallbackContext):
         await (update.callback_query.edit_message_text if update.callback_query 
                else update.message.reply_text)(
             f'👨🏫 به ربات آموزشی دکتر حجت قیمتگر خوش آمدید!\n{UNIVERSITY_INFO}\n'
-            '''
-
-
-
-'''
             'لطفاً گزینه مورد نظر را انتخاب کنید:',
             reply_markup=reply_markup
         )
+        return ConversationHandler.END
     except Exception as e:
         logger.error(f"خطا در شروع: {e}")
         await handle_error(update, context)
-
+        return ConversationHandler.END
+    
 async def admin_panel(update: Update, context: CallbackContext):
     query = update.callback_query
     await query.answer()
@@ -259,6 +288,7 @@ async def admin_panel(update: Update, context: CallbackContext):
     keyboard = [
         [InlineKeyboardButton("📊 آمار کاربران", callback_data='stats')],
         [InlineKeyboardButton("📣 ارسال همگانی", callback_data='broadcast')],
+        [InlineKeyboardButton("💬 چت کاربران", callback_data='user_chats')],
         [InlineKeyboardButton("🔙 بازگشت", callback_data='back_to_main')]
     ]
     
@@ -340,12 +370,17 @@ async def confirm_broadcast(update: Update, context: CallbackContext):
 async def start_smart_chat(update: Update, context: CallbackContext):
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text("💬 لطفا سوال خود را بپرسید:")
+    await query.edit_message_text(
+        "💬 لطفا سوال خود را بپرسید:",
+        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 بازگشت", callback_data='end_chat')]])
+    )
     return SMART_CHAT
 
 async def end_chat(update: Update, context: CallbackContext):
     query = update.callback_query
-    await query.answer()
+    if query:
+        await query.answer()
+    context.user_data.clear()
     await start(update, context)
     return ConversationHandler.END
 
@@ -444,7 +479,6 @@ async def send_course_files(update: Update, context: CallbackContext, course_typ
         logger.error(f"خطای کلی: {e}")
         await handle_error(update, context)
 
-
 async def send_drive_link(update: Update, context: CallbackContext, course_type: str):
     query = update.callback_query
     await query.answer()
@@ -460,17 +494,24 @@ async def send_drive_link(update: Update, context: CallbackContext, course_type:
 
 async def handle_chat_message(update: Update, context: CallbackContext):
     user_message = update.message.text
+    user_id = update.effective_user.id
+    
+    # Save user message
+    Database.add_chat_message(user_id, user_message, 'user')
     
     try:
         conn = sqlite3.connect('bot_users.db')
         c = conn.cursor()
         c.execute('UPDATE users SET message_count = message_count + 1 WHERE user_id = ?',
-                  (update.effective_user.id,))
+                  (user_id,))
         conn.commit()
         conn.close()
         
         await context.bot.send_chat_action(update.effective_chat.id, "typing")
         response = await GoogleAIChat.generate_response(user_message)
+        
+        # Save bot response
+        Database.add_chat_message(user_id, response, 'bot')
         
         await update.message.reply_text(
             response,
@@ -482,6 +523,56 @@ async def handle_chat_message(update: Update, context: CallbackContext):
         await update.message.reply_text("⚠️ خطایی در پردازش سوال رخ داد!")
     
     return SMART_CHAT
+
+async def show_chat_users(update: Update, context: CallbackContext):
+    query = update.callback_query
+    await query.answer()
+    
+    users = Database.get_chat_users()
+    if not users:
+        await query.edit_message_text("هنوز هیچ چتی ثبت نشده است.")
+        return ADMIN_PANEL
+    
+    keyboard = []
+    for user_id in users:
+        keyboard.append([InlineKeyboardButton(f"👤 کاربر {user_id}", callback_data=f'view_chat_{user_id}')])
+    
+    keyboard.append([InlineKeyboardButton("🔙 بازگشت", callback_data='admin_panel')])
+    
+    await query.edit_message_text(
+        "لیست کاربران با چت‌های ذخیره شده:",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+    return ADMIN_PANEL
+
+async def show_user_chat(update: Update, context: CallbackContext):
+    query = update.callback_query
+    await query.answer()
+    
+    user_id = int(query.data.split('_')[2])
+    chats = Database.get_user_chats(user_id)
+    
+    chat_history = "📜 تاریخچه چت کاربر:\n\n"
+    for msg in chats:
+        sender = "کاربر" if msg[1] == 'user' else "ربات"
+        time = datetime.fromisoformat(msg[2]).strftime("%Y-%m-%d %H:%M")
+        chat_history += f"⏰ {time}\n🎭 {sender}:\n{msg[0]}\n\n"
+    
+    # Split long messages
+    if len(chat_history) > 4096:
+        parts = [chat_history[i:i+4096] for i in range(0, len(chat_history), 4096)]
+        for part in parts:
+            await query.message.reply_text(part)
+    else:
+        await query.edit_message_text(chat_history)
+    
+    await query.message.reply_text(
+        "🔙",
+        reply_markup=InlineKeyboardMarkup(
+            [[InlineKeyboardButton("بازگشت به لیست چت‌ها", callback_data='user_chats')]]
+        )
+    )
+    return ADMIN_PANEL
 
 async def button_click(update: Update, context: CallbackContext):
     try:
@@ -504,6 +595,10 @@ async def button_click(update: Update, context: CallbackContext):
             await start(update, context)
         elif query.data == 'end_chat':
             await end_chat(update, context)
+        elif query.data == 'user_chats':
+            await show_chat_users(update, context)
+        elif query.data.startswith('view_chat_'):
+            await show_user_chat(update, context)
         else:
             await query.edit_message_text(text="🔄 این بخش به زودی اضافه خواهد شد")
             
@@ -513,12 +608,10 @@ async def button_click(update: Update, context: CallbackContext):
 
 def main():
     print("✅ Dr. Gheymatgar's educational bot is now active!")
-
     
     for course in COURSES.values():
         os.makedirs(course['folder'], exist_ok=True)
         print(f"📂 The folder {course['folder']} has been created/verified")
-
     
     application = Application.builder().token(TOKEN).build()
     
@@ -535,7 +628,9 @@ def main():
             ADMIN_PANEL: [
                 CallbackQueryHandler(handle_admin_actions, pattern='^(stats|broadcast)$'),
                 MessageHandler(filters.TEXT & ~filters.COMMAND, handle_broadcast),
-                CallbackQueryHandler(confirm_broadcast, pattern='^confirm_broadcast$')
+                CallbackQueryHandler(confirm_broadcast, pattern='^confirm_broadcast$'),
+                CallbackQueryHandler(show_chat_users, pattern='^user_chats$'),
+                CallbackQueryHandler(show_user_chat, pattern='^view_chat_')
             ]
         },
         fallbacks=[
